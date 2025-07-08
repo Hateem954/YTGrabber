@@ -133,13 +133,13 @@
 // }
 
 
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:saver_gallery/saver_gallery.dart' show SaverGallery;
+import 'package:saver_gallery/saver_gallery.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -153,6 +153,19 @@ class _HomePageState extends State<HomePage> {
   String _statusMessage = '';
   bool _isLoading = false;
   double _downloadProgress = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _askPermissions();
+  }
+
+  Future<void> _askPermissions() async {
+    await [
+      Permission.storage,
+      Permission.photos, // iOS only
+    ].request();
+  }
 
   String fileNameFromPath(String path) {
     return path.split('/').last;
@@ -185,7 +198,7 @@ class _HomePageState extends State<HomePage> {
 
       if (data['status'] == 'success') {
         final fileName = data['file'];
-        final fileUrl = 'http://192.168.100.68:5000/video/$fileName';
+        final fileUrl = 'http://192.168.100.68:5000/GTGrabber/$fileName';
 
         final tempDir = await getTemporaryDirectory();
         final tempPath = '${tempDir.path}/$fileName';
